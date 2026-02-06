@@ -1,0 +1,16 @@
+groups:
+  - name: api-alerts
+    rules:
+      - alert: HighApiErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[2m]))
+            /
+            sum(rate(http_requests_total[2m]))
+          ) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High API error rate"
+          description: "More than 5% of API requests are failing with 5xx errors"

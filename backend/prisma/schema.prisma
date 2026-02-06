@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Request {
+  id     Int  @id @default(autoincrement())
+  service  String
+  route String
+  method String
+  status Int
+  durationMs Int @map("duration_ms")
+  timestamp DateTime @default(now()) @map("timestamp")
+  
+  @@map("requests") // prisma will take this field name and map it to the actual database column name "requests"
+                   // since i had previously created the table with that name so i need to map it here
+  @@index([timestamp])
+  @@index([service])
+  @@index([route])
+
+
+}
+
+
+model ServiceMetrics {
+  id        Int      @id @default(autoincrement())
+  service   String
+  windowStart DateTime @map("window_start")
+  windowEnd   DateTime @map("window_end")
+
+  requestCount Int    @map("request_count")
+  errorCount   Int    @map("error_count")
+  errorRate    Float  @map("error_rate")
+
+  avgLatencyMs  Float @map("avg_latency_ms")
+  p95LatencyMs  Float @map("p95_latency_ms")
+  
+  createdAt DateTime @default(now()) @map("created_at")
+
+ 
+  
+  @@map("service_metrics")
+  @@index([service])
+  @@index([windowStart])
+}
+
